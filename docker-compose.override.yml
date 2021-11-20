@@ -1,0 +1,46 @@
+version: '3.7'
+services:
+  web:
+    ports:
+      - "80:80"
+    volumes:
+      - ./public:/var/www/html/public
+      - ./infrastructure/docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    networks:
+      - local-network
+
+  app:
+    # hack in order to simplify local development
+    user: "root"
+    entrypoint: ''
+    command: sh -c "chown -R www-data:www-data storage && docker-php-entrypoint php-fpm"
+    volumes:
+      - ./:/var/www/html
+    env_file: .env
+    depends_on:
+      - redis
+      - db
+    networks:
+      - local-network
+
+  db:
+    image: mysql:8.0.24
+    restart: unless-stopped
+    tty: true
+    environment:
+      MYSQL_DATABASE: grapefruit_booking_api
+      MYSQL_ROOT_PASSWORD: "3359xa78#u"
+      SERVICE_NAME: mysql
+      SERVICE_TAGS: dev
+    ports:
+      - "33060:3306"
+    networks:
+      - local-network
+
+  redis:
+    image: redis:6.0-alpine
+    networks:
+      - local-network
+
+networks:
+  local-network:
