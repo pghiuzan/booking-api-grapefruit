@@ -32,3 +32,9 @@ $router->group(['middleware' => 'apiKeyAuth'], static function() use ($router) {
 $router->group(['prefix' => 'auth'], static function() use ($router) {
     $router->post('/', ['uses' => 'AuthController@login']);
 });
+
+$router->group(['prefix' => 'auth-test', 'middleware' => 'auth:api'], static function() use ($router) {
+    $router->get('/', function() {
+        return auth()->user();
+    });
+});
