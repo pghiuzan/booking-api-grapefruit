@@ -217,4 +217,22 @@ class UsersControllerTest extends FunctionalTestCase
             'email' => $user->email,
         ]);
     }
+
+    public function testDeleteUser()
+    {
+        $user = User::factory()->create([
+            'first_name' => 'John',
+            'last_name' => 'Doe',
+        ]);
+
+        $this->json('DELETE', sprintf('%s/%d', self::ENDPOINT, $user->id));
+        $this->assertResponseOk();
+        $this->seeInDatabase('users', [
+            'id' => $user->id,
+        ]);
+        $this->notSeeInDatabase('users', [
+            'id' => $user->id,
+            'deleted_at' => null
+        ]);
+    }
 }

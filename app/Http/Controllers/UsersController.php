@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\UserResource;
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -103,5 +105,22 @@ class UsersController extends Controller
         $existingUser->save();
 
         return new UserResource($existingUser);
+    }
+
+    public function delete(int $id): JsonResponse
+    {
+        $existingUser = User::find($id);
+        if (!$existingUser) {
+            throw new NotFoundHttpException(sprintf(
+                'User with ID %d does not eixst.',
+                $id
+            ));
+        }
+
+        $existingUser->delete();
+
+        return response()->json([
+            'status' => 'success',
+        ]);
     }
 }
