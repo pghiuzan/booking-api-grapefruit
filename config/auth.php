@@ -86,4 +86,8 @@ return [
         //
     ],
 
+    'loginThrottle' => [
+        'timeLimit' => env('LOGIN_THROTTLE_TIME_LIMIT_SECONDS', 60),
+        'rateLimit' => env('LOGIN_THROTTLE_RATE_LIMIT', 5),
+    ],
 ];

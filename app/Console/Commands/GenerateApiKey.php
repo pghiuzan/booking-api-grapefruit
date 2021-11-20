@@ -2,8 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\Models\ApiKey;
-use App\Services\Hashing\Auth\ApiKey\ApiKeyGeneratorInterface;
+use App\Services\Auth\ApiKey\ApiKeyGeneratorInterface;
 use Illuminate\Console\Command;
 
 class GenerateApiKey extends Command

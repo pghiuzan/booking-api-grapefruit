@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\Hashing\Auth\ApiKey;
+namespace App\Services\Auth\ApiKey;
 
 interface ApiKeyGeneratorInterface
 {

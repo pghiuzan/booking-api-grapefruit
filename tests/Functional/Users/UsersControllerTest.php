@@ -4,6 +4,7 @@ namespace Tests\Functional\Users;
 
 use App\Models\User;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB;
 use Tests\FunctionalTestCase;
 
 class UsersControllerTest extends FunctionalTestCase
@@ -20,6 +21,8 @@ class UsersControllerTest extends FunctionalTestCase
 
     public function testListingUsers()
     {
+        DB::table('users')->truncate();
+
         $user1 = User::factory()->create();
         $user2 = User::factory()->create();
         $user3 = User::factory()->create();

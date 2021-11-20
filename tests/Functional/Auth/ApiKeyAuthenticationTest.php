@@ -2,7 +2,7 @@
 
 namespace Tests\Functional\Auth;
 
-use App\Services\Hashing\Auth\ApiKey\ApiKeyGeneratorInterface;
+use App\Services\Auth\ApiKey\ApiKeyGeneratorInterface;
 use Illuminate\Http\Response;
 use Tests\FunctionalTestCase;
 

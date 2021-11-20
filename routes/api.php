@@ -30,5 +30,5 @@ $router->group(['middleware' => 'apiKeyAuth'], static function() use ($router) {
 });
 
 $router->group(['prefix' => 'auth'], static function() use ($router) {
-    $router->get('/', ['uses' => 'AuthController@login']);
+    $router->post('/', ['uses' => 'AuthController@login']);
 });
