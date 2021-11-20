@@ -14,7 +14,17 @@
 */
 
 $router->group(['middleware' => 'apiKeyAuth'], static function() use ($router) {
-    $router->get('/', function () use ($router) {
-        return $router->app->version();
+    $router->get('/health-check', function () {
+        return response()->json([
+            'status' => 'ok',
+        ]);
+    });
+
+    $router->group(['prefix' => 'users'], static function() use ($router) {
+        $router->get('/', ['uses' => 'UsersController@index']);
+        $router->get('/{id}', ['uses' => 'UsersController@read']);
+        $router->post('/', ['uses' => 'UsersController@create']);
+        $router->patch('/{id}', ['uses' => 'UsersController@update']);
+        $router->delete('/{id}', ['uses' => 'UsersController@delete']);
     });
 });

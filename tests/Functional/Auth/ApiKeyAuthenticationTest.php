@@ -8,9 +8,11 @@ use Tests\FunctionalTestCase;
 
 class ApiKeyAuthenticationTest extends FunctionalTestCase
 {
+    private const ENDPOINT = '/health-check';
+
     public function testGettingUnauthorizedErrorWhenNotAuthenticated()
     {
-        $this->get('/');
+        $this->get(self::ENDPOINT);
         $this->assertResponseStatus(Response::HTTP_UNAUTHORIZED);
         $this->seeJson([
             'status' => 'error',
@@ -21,7 +23,7 @@ class ApiKeyAuthenticationTest extends FunctionalTestCase
 
     public function testGettingUnauthorizedErrorWithWrongKey()
     {
-        $this->get('/', [
+        $this->get(self::ENDPOINT, [
             'Api-Key' => 'some-random-key',
         ]);
         $this->assertResponseStatus(Response::HTTP_UNAUTHORIZED);
@@ -38,7 +40,7 @@ class ApiKeyAuthenticationTest extends FunctionalTestCase
         $keyGenerator = $this->app->make(ApiKeyGeneratorInterface::class);
         $key = $keyGenerator->generateKey();
 
-        $this->get('/', [
+        $this->get(self::ENDPOINT, [
             'Api-Key' => $key,
         ]);
         $this->assertResponseOk();
