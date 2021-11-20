@@ -168,4 +168,37 @@ class TripsControllerTest extends FunctionalTestCase
             'deleted_at' => null
         ]);
     }
+
+    public function testSearchTrips()
+    {
+        DB::table('trips')->truncate();
+
+        $trip1 = Trip::factory()->create([
+            'title' => 'Test trip 1',
+            'price' => 100,
+        ]);
+        $trip2 = Trip::factory()->create([
+            'title' => 'trip 2',
+            'description' => 'Second test trip',
+            'price' => 200,
+        ]);
+        Trip::factory()->create([
+            'title' => 'Super Awesome Trip',
+            'description' => 'This is the best trip ever',
+        ]);
+
+        $this->json('GET', $this->createUri(self::ENDPOINT . '/search', [
+            'search' => 'test',
+            'orderBy' => 'price',
+            'orderDirection' => 'desc',
+            'minPrice' => 0,
+            'maxPrice' => 999999999.99,
+        ]));
+        $this->assertResponseOk();
+
+        $response = json_decode($this->response->getContent(), true);
+        $this->assertSame(2, count($response['data']));
+        $this->assertSame($trip2->id, $response['data'][0]['id']);
+        $this->assertSame($trip1->id, $response['data'][1]['id']);
+    }
 }

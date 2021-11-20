@@ -2,16 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\DTO\TripsFilterDTO;
 use App\Http\Resources\TripResource;
-use App\Http\Resources\UserResource;
 use App\Models\Trip;
 use App\Models\TripLocation;
-use App\Models\User;
+use App\Services\TripsFilterService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -157,5 +157,22 @@ class TripsController extends Controller
         return response()->json([
             'status' => 'success',
         ]);
+    }
+
+    public function search(Request $request, TripsFilterService $filterService): AnonymousResourceCollection
+    {
+        DB::enableQueryLog();
+
+        $pageSize = $request->get('perPage', self::DEFAULT_PAGE_SIZE);
+        $page = $request->get('page', 1);
+        $data = $filterService->filterTrips(
+            TripsFilterDTO::fromRequest($request),
+            $pageSize,
+            $page
+        );
+
+        /* dd(DB::getQueryLog()); */
+
+        return TripResource::collection($data);
     }
 }
