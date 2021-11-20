@@ -29,6 +29,17 @@ $router->group(['middleware' => 'apiKeyAuth'], static function() use ($router) {
     });
 });
 
+$router->group(['prefix' => 'trips'], static function() use ($router) {
+    $router->get('/', ['uses' => 'TripsController@index']);
+    $router->get('/{slug}', ['uses' => 'TripsController@read']);
+
+    $router->group(['middleware' => 'apiKeyAuth'], static function() use ($router) {
+        $router->post('/', ['uses' => 'TripsController@create']);
+        $router->patch('/{slug}', ['uses' => 'TripsController@update']);
+        $router->delete('/{id}', ['uses' => 'TripsController@delete']);
+    });
+});
+
 $router->group(['prefix' => 'auth'], static function() use ($router) {
     $router->post('/', ['uses' => 'AuthController@login']);
 });

@@ -2,17 +2,21 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\TripResource;
 use App\Http\Resources\UserResource;
+use App\Models\Trip;
+use App\Models\TripLocation;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
-use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-class UsersController extends Controller
+class TripsController extends Controller
 {
     public const DEFAULT_PAGE_SIZE = 10;
 
@@ -21,103 +25,134 @@ class UsersController extends Controller
         $pageSize = $request->get('perPage', self::DEFAULT_PAGE_SIZE);
         $page = $request->get('page', 1);
 
-        return UserResource::collection(
-            User::orderBy('id')->paginate($pageSize, ['*'], 'users', $page)
+        return TripResource::collection(
+            Trip::orderBy('id')->paginate($pageSize, ['*'], 'trips', $page)
         );
     }
 
     /**
      * @throws NotFoundHttpException
      */
-    public function read(int $id): UserResource
+    public function read(string $slug): TripResource
     {
-        $user = User::find($id);
+        $trip = Trip::where('slug', $slug)->first();
 
-        if (!$user) {
+        if (!$trip) {
             throw new NotFoundHttpException(sprintf(
-                'User with ID %d does not exist',
-                $id
+                'Trip %s does not exist',
+                $slug
             ));
         }
 
-        return new UserResource($user);
+        return new TripResource($trip);
     }
 
     /**
      * @throws ValidationException
      */
-    public function create(Request $request): UserResource
+    public function create(Request $request): TripResource
     {
         $this->validate($request, [
-            'first_name' => 'required|string',
-            'last_name' => 'required|string',
-            'email' => 'required|email',
-            'password' => 'required|min:8|confirmed',
+            'title' => 'required|string',
+            'description' => 'required|string',
+            'location.city' => 'required|string',
+            'location.country' => 'required|string',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date',
+            'price' => 'required|numeric',
         ]);
 
-        // for some reason, the unique rule doesn't work well during tests
-        $existingUser = User::where('email', $request->get('email'))->first();
-        if ($existingUser) {
-            throw ValidationException::withMessages([
-                'email' => [
-                    sprintf('User with %s email already exists.', $request->get('email')),
-                ],
-            ]);
+        $location = TripLocation::updateOrCreate([
+            'city' => $request->get('location')['city'],
+            'country' => $request->get('location')['country'],
+        ]);
+
+        $slug = $this->getSlugFromTitle($request->get('title'));
+
+        $startDate = new Carbon($request->start_date);
+        $endDate = new Carbon($request->end_date);
+
+        if ($startDate > $endDate) {
+            [$startDate, $endDate] = [$endDate, $startDate];
         }
 
-        $user = User::create([
-            'first_name' => $request->get('first_name'),
-            'last_name' => $request->get('last_name'),
-            'email' => $request->get('email'),
-            'password' => Hash::make($request->get('password')),
+        $trip = Trip::create([
+            'slug' => $slug,
+            'title' => $request->get('title'),
+            'description' => $request->get('description'),
+            'start_date' => $startDate,
+            'end_date' => $endDate,
+            'location_id' => $location->id,
+            'price' => $request->get('price'),
         ]);
 
-        return new UserResource($user);
+        return new TripResource($trip);
+    }
+
+    private function getSlugFromTitle(string $title): string
+    {
+        $slug = Str::slug($title);
+        $increment = 1;
+        while (Trip::where('slug', $slug)->first()) {
+            $increment++;
+            $slug = Str::slug($title . ' ' . $increment);
+        }
+
+        return $slug;
     }
 
     /**
      * @throws ValidationException
      */
-    public function update(Request $request, int $id): UserResource
+    public function update(Request $request, string $slug): TripResource
     {
         $this->validate($request, [
-            'first_name' => 'sometimes|string',
-            'last_name' => 'sometimes|string',
-            'email' => 'sometimes|email',
-            'password' => 'sometimes|min:8|confirmed',
+            'title' => 'sometimes|string',
+            'description' => 'sometimes|string',
+            'location.city' => 'sometimes|string',
+            'location.country' => 'sometimes|string',
+            'start_date' => 'sometimes|date',
+            'end_date' => 'sometimes|date',
+            'price' => 'sometimes|numeric',
         ]);
 
-        $existingUser = User::find($id);
-        if (!$existingUser) {
+        $existingTrip = Trip::where('slug', $slug)->first();
+        if (!$existingTrip) {
             throw new NotFoundHttpException(sprintf(
-                'User with ID %d does not eixst.',
-                $id
+                'Trip %s does not eixst.',
+                $slug
             ));
         }
 
-        $existingUser->first_name = $request->get('first_name', $existingUser->first_name);
-        $existingUser->last_name = $request->get('last_name', $existingUser->last_name);
-        $existingUser->email = $request->get('email', $existingUser->email);
-        $existingUser->password = $request->has('password')
-            ? Hash::make($request->get('password'))
-            : $existingUser->password;
+        $location = TripLocation::updateOrCreate([
+            'city' => $request->get('location')['city'],
+            'country' => $request->get('location')['country'],
+        ]);
 
-        $existingUser->save();
+        $existingTrip->title = $request->get('title', $existingTrip->title);
+        $existingTrip->description = $request->get('description', $existingTrip->description);
+        $existingTrip->start_date = $request->get('start_date', $existingTrip->start_date);
+        $existingTrip->end_date = $request->get('end_date', $existingTrip->end_date);
+        $existingTrip->price = $request->get('price', $existingTrip->price);
+        $existingTrip->title = $request->get('title', $existingTrip->title);
+        $existingTrip->location_id = $location->id;
 
-        return new UserResource($existingUser);
+        $existingTrip->save();
+
+        return new TripResource($existingTrip);
     }
 
     public function delete(int $id): JsonResponse
     {
-        $existingUser = User::find($id);
-        if (!$existingUser) {
+        $existingTrip = Trip::find($id);
+        if (!$existingTrip) {
             throw new NotFoundHttpException(sprintf(
-                'User with ID %d does not eixst.',
+                'Trip with ID %d does not eixst.',
                 $id
             ));
         }
 
-        $existingUser->delete();
+        $existingTrip->delete();
 
         return response()->json([
             'status' => 'success',
