@@ -26,6 +26,11 @@ docker-compose up -d
 docker-compose exec app composer install
 ## run migrations
 docker-compose exec app php artisan migrate
+## get an API key
+docker-compose exec app php artisan api:generate-key
+## generate JWT auth key
+docker-compose exec app php artisan jwt:secret
+### make sure the outputed secret in added in the .env file (JWT_SECRET variable)
 ```
 
 Now the API should running and be accessible at `http://localhost`

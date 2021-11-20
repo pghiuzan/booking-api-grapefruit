@@ -28,3 +28,7 @@ $router->group(['middleware' => 'apiKeyAuth'], static function() use ($router) {
         $router->delete('/{id}', ['uses' => 'UsersController@delete']);
     });
 });
+
+$router->group(['prefix' => 'auth'], static function() use ($router) {
+    $router->get('/', ['uses' => 'AuthController@login']);
+});
