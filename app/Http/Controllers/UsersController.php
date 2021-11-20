@@ -85,7 +85,7 @@ class UsersController extends Controller
             'password' => 'sometimes|min:8|confirmed',
         ]);
 
-        $existingUser = User::where('email', $request->get('email'))->first();
+        $existingUser = User::find($id);
         if (!$existingUser) {
             throw new NotFoundHttpException(sprintf(
                 'User with ID %d does not eixst.',

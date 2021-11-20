@@ -192,4 +192,29 @@ class UsersControllerTest extends FunctionalTestCase
             'email' => [sprintf('User with %s email already exists.', $user->email)],
         ]]);
     }
+
+    public function testUpdateUser()
+    {
+        $user = User::factory()->create([
+            'first_name' => 'John',
+            'last_name' => 'Doe',
+        ]);
+
+        $this->json('PATCH', sprintf('%s/%d', self::ENDPOINT, $user->id), [
+            'first_name' => 'Jane',
+            'last_name' => 'Eod',
+        ]);
+        $this->assertResponseOk();
+        $this->seeJson([
+            'first_name' => 'Jane',
+            'last_name' => 'Eod',
+            'email' => $user->email,
+        ]);
+        $this->seeInDatabase('users', [
+            'id' => $user->id,
+            'first_name' => 'Jane',
+            'last_name' => 'Eod',
+            'email' => $user->email,
+        ]);
+    }
 }
