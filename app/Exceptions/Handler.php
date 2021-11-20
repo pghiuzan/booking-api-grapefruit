@@ -4,6 +4,9 @@ namespace App\Exceptions;
 
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Database\QueryException;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 use Laravel\Lumen\Exceptions\Handler as ExceptionHandler;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -49,6 +52,32 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Throwable $exception)
     {
-        return parent::render($request, $exception);
+        $errorCode = $exception->getCode();
+        if ($exception instanceof HttpException) {
+            $errorCode = $exception->getStatusCode();
+        }
+
+        if (empty($errorCode) || !is_numeric($errorCode)) {
+            $errorCode = Response::HTTP_INTERNAL_SERVER_ERROR;
+        }
+
+        $response = [
+            'status' => 'error',
+            'message' => $exception->getMessage(),
+            'code' => $errorCode,
+        ];
+
+        if ($exception instanceof QueryException) {
+            // do not expose details to queries that will give away details about the DB structure
+            $response['message'] = 'Query error, details available in the app logs (suppressed for security reasons)';
+        }
+
+        if ($exception instanceof ValidationException) {
+            $errorCode = Response::HTTP_UNPROCESSABLE_ENTITY;
+            $response['code'] = $errorCode;
+            $response['errors'] = $exception->errors();
+        }
+
+        return response()->json($response, (int) $errorCode);
     }
 }
