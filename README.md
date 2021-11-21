@@ -4,8 +4,8 @@ Paul Ghiuzan's implementation of the Booking API technical challenge
 
 ## Topics
 
-[Installation](docs/installation.md)
-[API docs](docs/api_docs.md)
+ - [Installation](docs/installation.md)
+ - [API docs](docs/api_docs.md)
 
 ## Testing
 

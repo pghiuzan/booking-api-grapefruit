@@ -12,4 +12,4 @@ Users authorization is done through JSON Web Tokens.
 
 ## Endpoints
 
-See included [Postman collection](Grapefruit.ro Tech Challenge - Paul Ghiuzan.postman_collection.json).
+See included [Postman collection](Grapefruit.ro_Tech_Challenge_-_Paul_Ghiuzan.postman_collection.json).
