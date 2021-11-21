@@ -93,7 +93,7 @@ class TripsController extends Controller
     {
         $slug = Str::slug($title);
         $increment = 1;
-        while (Trip::where('slug', $slug)->first()) {
+        while (Trip::withTrashed()->where('slug', $slug)->first()) {
             $increment++;
             $slug = Str::slug($title . ' ' . $increment);
         }
