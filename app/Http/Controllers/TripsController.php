@@ -59,7 +59,7 @@ class TripsController extends Controller
             'location.country' => 'required|string',
             'start_date' => 'required|date',
             'end_date' => 'required|date',
-            'price' => 'required|numeric',
+            'price' => 'required|numeric|min:0',
         ]);
 
         $location = TripLocation::updateOrCreate([
@@ -113,7 +113,7 @@ class TripsController extends Controller
             'location.country' => 'sometimes|string',
             'start_date' => 'sometimes|date',
             'end_date' => 'sometimes|date',
-            'price' => 'sometimes|numeric',
+            'price' => 'sometimes|numeric|min:0',
         ]);
 
         $existingTrip = Trip::where('slug', $slug)->first();

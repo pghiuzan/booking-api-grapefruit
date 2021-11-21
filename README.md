@@ -18,6 +18,7 @@ Run `docker-compose exec vendor/bin/phpunit` to run the tests.
 2. There seems to be a problem using the `tymon/jwt-auth` package in Lumen tests, receiving an error saying `Auth driver [jwt] for guard [api] is not defined.`. It works fine when running the application normally.
 3. The login attempts rate limiter could be copied/inherited from Laravel, instead of writing a custom solution for it.
 4. Better documentation for the API
+5. Maybe more validations/constraints are necessary on the resources data
 
 ## License
 

@@ -200,12 +200,68 @@
 							}
 						],
 						"url": {
-							"raw": "{{BASE_URL}}/users",
+							"raw": "{{BASE_URL}}/trips",
 							"host": [
 								"{{BASE_URL}}"
 							],
 							"path": [
-								"users"
+								"trips"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search Trips",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Api-Key",
+								"value": "{{API_KEY}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{BASE_URL}}/trips/search?search=RoyalBlue&minPrice=0&maxPrice=100000&orderBy=price&orderDirection=desc",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"trips",
+								"search"
+							],
+							"query": [
+								{
+									"key": "search",
+									"value": "RoyalBlue"
+								},
+								{
+									"key": "minPrice",
+									"value": "0"
+								},
+								{
+									"key": "maxPrice",
+									"value": "100000"
+								},
+								{
+									"key": "orderBy",
+									"value": "price"
+								},
+								{
+									"key": "orderDirection",
+									"value": "desc"
+								}
 							]
 						}
 					},
