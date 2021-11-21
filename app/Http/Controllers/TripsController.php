@@ -161,8 +161,6 @@ class TripsController extends Controller
 
     public function search(Request $request, TripsFilterService $filterService): AnonymousResourceCollection
     {
-        DB::enableQueryLog();
-
         $pageSize = $request->get('perPage', self::DEFAULT_PAGE_SIZE);
         $page = $request->get('page', 1);
         $data = $filterService->filterTrips(
@@ -170,8 +168,6 @@ class TripsController extends Controller
             $pageSize,
             $page
         );
-
-        /* dd(DB::getQueryLog()); */
 
         return TripResource::collection($data);
     }
