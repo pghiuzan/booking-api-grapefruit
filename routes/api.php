@@ -27,12 +27,16 @@ $router->group(['middleware' => 'apiKeyAuth'], static function() use ($router) {
         $router->patch('/{id}', ['uses' => 'UsersController@update']);
         $router->delete('/{id}', ['uses' => 'UsersController@delete']);
     });
+
+    $router->group(['prefix' => 'bookings'], static function() use ($router) {
+        $router->get('/', ['uses' => 'BookingsController@index']);
+    });
 });
 
 $router->group(['prefix' => 'trips'], static function() use ($router) {
     $router->get('/', ['uses' => 'TripsController@index']);
-    $router->get('/{slug}', ['uses' => 'TripsController@read']);
     $router->get('/search', ['uses' => 'TripsController@search']);
+    $router->get('/{slug}', ['uses' => 'TripsController@read']);
 
     $router->group(['middleware' => 'apiKeyAuth'], static function() use ($router) {
         $router->post('/', ['uses' => 'TripsController@create']);
@@ -45,8 +49,6 @@ $router->group(['prefix' => 'auth'], static function() use ($router) {
     $router->post('/', ['uses' => 'AuthController@login']);
 });
 
-$router->group(['prefix' => 'auth-test', 'middleware' => 'auth:api'], static function() use ($router) {
-    $router->get('/', function() {
-        return auth()->user();
-    });
+$router->group(['prefix' => 'bookings', 'middleware' => 'auth:api'], static function() use ($router) {
+    $router->post('/', ['uses' => 'BookingsController@bookTrip']);
 });

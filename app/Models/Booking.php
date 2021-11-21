@@ -12,6 +12,10 @@ class Booking extends Model
     use HasFactory;
     use SoftDeletes;
 
+    public const STATUS_RESERVED = 'reserved';
+    public const STATUS_CONFIRMED = 'confirmed';
+    public const STATUS_CANCELLED = 'cancelled';
+
     /**
      * The attributes that are mass assignable.
      *
