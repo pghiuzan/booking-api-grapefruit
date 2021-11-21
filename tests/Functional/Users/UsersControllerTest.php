@@ -5,6 +5,7 @@ namespace Tests\Functional\Users;
 use App\Models\User;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Tests\FunctionalTestCase;
 
 class UsersControllerTest extends FunctionalTestCase
@@ -21,7 +22,9 @@ class UsersControllerTest extends FunctionalTestCase
 
     public function testListingUsers()
     {
+        Schema::disableForeignKeyConstraints();
         DB::table('users')->truncate();
+        Schema::enableForeignKeyConstraints();
 
         $user1 = User::factory()->create();
         $user2 = User::factory()->create();

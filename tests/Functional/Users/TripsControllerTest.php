@@ -5,6 +5,7 @@ namespace Tests\Functional\Trips;
 use App\Models\Trip;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Tests\FunctionalTestCase;
 
 class TripsControllerTest extends FunctionalTestCase
@@ -21,7 +22,9 @@ class TripsControllerTest extends FunctionalTestCase
 
     public function testListingTrips()
     {
+        Schema::disableForeignKeyConstraints();
         DB::table('trips')->truncate();
+        Schema::enableForeignKeyConstraints();
 
         $trip1 = Trip::factory()->create();
         $trip2 = Trip::factory()->create();
@@ -171,7 +174,9 @@ class TripsControllerTest extends FunctionalTestCase
 
     public function testSearchTrips()
     {
+        Schema::disableForeignKeyConstraints();
         DB::table('trips')->truncate();
+        Schema::enableForeignKeyConstraints();
 
         $trip1 = Trip::factory()->create([
             'title' => 'Test trip 1',
